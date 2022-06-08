@@ -1,7 +1,8 @@
 Gemlock Parser Licenses
 =======================
 
-This project is build on modified files from ScanCode.
+This project consists of vendored files from ScanCode. Note that these files
+were modified by contributors to this repository.
 
 SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
 
