@@ -1,0 +1,9 @@
+# To get rid of warnings for Ruby Gemfile.lock test data files
+
+version: 2
+updates:
+    - package-ecosystem: "pip"
+      directory: "/"
+      schedule:
+          interval: "daily"
+    
