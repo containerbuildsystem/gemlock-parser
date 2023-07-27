@@ -1,6 +1,6 @@
 # This file is a modified version of test_gemfile_lock.py from Scancode, based on work
 # of nexB Inc. and others. See original file at
-# https://github.com/nexB/scancode-toolkit/blob/aba31126dcb3ab57f2b885090f7145f69b67351a/tests/packagedcode/test_gemfile_lock.py
+# https://github.com/nexB/scancode-toolkit/blob/a15174f31efaf8816e8c9a65c9f85c4beffc0227/tests/packagedcode/test_gemfile_lock.py
 #
 # Copyright (c) nexB Inc. and others. All rights reserved.
 # ScanCode is a trademark of nexB Inc.
@@ -375,6 +375,14 @@ class TestGemfileLock(FileBasedTesting):
         expected_loc = 'gemfile_lock/platform/Gemfile.lock.expected.json'
         self.check_gemfile_lock(test_file, expected_loc, regen=REGEN_TEST_FIXTURES)
 
+    def test_GemfileLockParser_can_parse_bundled(self):
+        test_file = 'gemfile_lock/bundled/Gemfile.lock'
+        expected_loc = 'gemfile_lock/bundled/Gemfile.lock.expected.json'
+        self.check_gemfile_lock(test_file, expected_loc, regen=REGEN_TEST_FIXTURES)
+
+        gfl = gemfile_lock.GemfileLockParser(self.get_test_loc(test_file))
+        assert gfl.bundled_with == "2.0.1"
+
     def test_GemfileLockParser_can_parse_spec_single_level(self):
         test_file = 'gemfile_lock/spec/Gemfile.lock1'
         expected_loc = 'gemfile_lock/spec/Gemfile.lock1.expected.json'
@@ -454,4 +462,3 @@ class TestGemfileLock(FileBasedTesting):
         test_file = 'gemfile_lock/git/Gemfile.lock_single'
         expected_loc = 'gemfile_lock/git/Gemfile.lock_single.expected.json'
         self.check_gemfile_lock(test_file, expected_loc, regen=REGEN_TEST_FIXTURES)
-

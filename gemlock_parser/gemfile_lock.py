@@ -1,6 +1,6 @@
 # This file is a modified version of gemfile_lock.py from Scancode, based on
 # work of nexB Inc. and others. See original file at
-# https://github.com/nexB/scancode-toolkit/blob/aba31126dcb3ab57f2b885090f7145f69b67351a/src/packagedcode/gemfile_lock.py
+# https://github.com/nexB/scancode-toolkit/blob/a15174f31efaf8816e8c9a65c9f85c4beffc0227/src/packagedcode/gemfile_lock.py
 #
 # Copyright (c) nexB Inc. and others. All rights reserved.
 # ScanCode is a trademark of nexB Inc.
@@ -107,6 +107,7 @@ GIT = 'GIT'
 SVN = 'SVN'
 GEM = 'GEM'
 PLATFORMS = 'PLATFORMS'
+BUNDLED = 'BUNDLED WITH'
 DEPENDENCIES = 'DEPENDENCIES'
 SPECS = '  specs:'
 
@@ -338,6 +339,7 @@ SPEC_SUB_DEPS = re.compile(
     '$' % locals()).match
 
 PLATS = re.compile('^  (?P<platform>.*)$').match
+BUNDLED_WITH = re.compile('^\s+(?P<version>(?:\d+.)+\d+)\s*$').match
 
 
 class GemfileLockParser:
@@ -356,6 +358,7 @@ class GemfileLockParser:
         self.STATES = {
             DEPENDENCIES: self.parse_dependency,
             PLATFORMS: self.parse_platform,
+            BUNDLED: self.parse_bundler_version,
             GIT: self.parse_options,
             PATH: self.parse_options,
             SVN: self.parse_options,
@@ -366,10 +369,15 @@ class GemfileLockParser:
         # the final tree of dependencies, keyed by name
         self.dependency_tree = {}
 
+        # the package that the gemfile.lock is for
+        self.primary_gem = None
+
         # a flat dict of all gems, keyed by name
         self.all_gems = {}
 
         self.platforms = []
+
+        self.bundled_with = None
 
         # init parsing state
         self.reset_state()
@@ -397,6 +405,9 @@ class GemfileLockParser:
         # finally refine the collected data
         self.refine()
 
+        # set primary gem
+        self.set_primary_gem()
+
     def reset_state (self):
         self.state = None
         self.current_options = {}
@@ -406,6 +417,13 @@ class GemfileLockParser:
     def refine(self):
         for gem in self.all_gems.values():
             gem.refine()
+
+    def set_primary_gem(self):
+        for gem in self.all_gems.values():
+            if not gem.type == PATH:
+                continue
+            self.primary_gem = gem
+            break
 
     def get_or_create(self, name, version=None, platform=None):
         """
@@ -521,6 +539,16 @@ class GemfileLockParser:
         plat = plat.group('platform')
         self.platforms.append(plat.strip())
 
+    def parse_bundler_version(self, line):
+        version = BUNDLED_WITH(line)
+        if not version:
+            if TRACE:
+                logger_debug('ERROR: parse_bundler_version: '
+                      'line not matched: %(line)r' % locals())
+            return
+        version = version.group('version')
+        self.bundled_with = version
+
     def flatten(self):
         """
         Return the Gems dependency_tree as a sorted list of unique
@@ -531,4 +559,3 @@ class GemfileLockParser:
             flattened.append((None, direct,))
             flattened.extend(direct.flatten())
         return sorted(set(flattened))
-

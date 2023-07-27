@@ -1,6 +1,6 @@
 # This file is a modified version of test_analysis.py from Scancode, based on work
 # of nexB Inc. and others. See original file at
-# https://github.com/nexB/scancode-toolkit/blob/aba31126dcb3ab57f2b885090f7145f69b67351a/tests/textcode/test_analysis.py
+# https://github.com/nexB/scancode-toolkit/blob/a15174f31efaf8816e8c9a65c9f85c4beffc0227/tests/textcode/test_analysis.py
 #
 # Copyright (c) nexB Inc. and others. All rights reserved.
 # ScanCode is a trademark of nexB Inc.
